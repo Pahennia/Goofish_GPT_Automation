@@ -1,6 +1,6 @@
 from playwright.sync_api import sync_playwright
 import requests
-
+from pathlib import Path
 
 
 def GetImageURL(page, index):
@@ -35,6 +35,11 @@ def download_image(URL):
             ),
             "Referer": URL,
         }
+        #检测URL id
+        URL_id = URL.split("&id=")[1].split("&cat")[0]
+        #创建目录
+        path = Path(f"data/images/{URL_id}")
+        path.mkdir(parents=True, exist_ok=True)
 
         #下载图片
         for n in range(13):
@@ -51,11 +56,12 @@ def download_image(URL):
             #处理相对URL
             if img_url[n].startswith("//"):
                 img_url[n] = "https:" + img_url[n]
+            #下载图片
             resp = requests.get(img_url[n], headers=headers, timeout=10)
             resp.raise_for_status()             
-            with open(f"test{n}.jpg", "wb") as f:
-                f.write(resp.content)
-                print(f"图片已保存为 test{n}.jpg")
+            img_path = path / f"img_{n}.jpg"
+            img_path.write_bytes(resp.content)
+            print(f"已保存：{img_path}")
 
 
         
