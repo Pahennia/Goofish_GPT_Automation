@@ -35,6 +35,7 @@ def download_image(URL):
             ),
             "Referer": URL,
         }
+        
         #检测URL id
         URL_id = URL.split("&id=")[1].split("&cat")[0]
         #创建目录
