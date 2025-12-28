@@ -1,8 +1,7 @@
 from playwright.sync_api import sync_playwright
 import requests
 
-#定位网站URL
-URL = "https://www.goofish.com/item?spm=a21ybx.search.searchFeedList.2.1d3d41db5sx6bc&id=1007751981044&categoryId=126860474"
+
 
 def GetImageURL(page, index):
     #等待目标出现
@@ -11,7 +10,7 @@ def GetImageURL(page, index):
     img = page.query_selector(f'.slick-slide[data-index="{index}"] img')
     return img.get_attribute("src")
 
-def main():
+def download_image(URL):
     with sync_playwright() as p:
         #启动浏览器，初始化引擎
         browser = p.chromium.launch(headless=False)
@@ -22,7 +21,7 @@ def main():
 
         #获取图片 URL
         img_url = []
-        for i in range(15):
+        for i in range(13):
             img_url.append(GetImageURL(page,i))
 
 
@@ -38,7 +37,7 @@ def main():
         }
 
         #下载图片
-        for n in range(15):
+        for n in range(13):
             #定义图片
             img = page.query_selector(f'.slick-slide[data-index="{n}"] img')
             #定位图片的上层分类元素
@@ -64,4 +63,5 @@ def main():
         browser.close()
 
 if __name__ == "__main__":
-    main()
+    test_product_URL = "https://www.goofish.com/item?spm=a21ybx.item.itemCnxh.11.69aa3da6p4pIWN&id=1007091382903&categoryId=0"
+    download_image(test_product_URL)
