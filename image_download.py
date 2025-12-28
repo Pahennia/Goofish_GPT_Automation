@@ -19,9 +19,44 @@ def download_image(URL):
         #打开页面
         page.goto(URL)
 
+        #等待加载
+        page.wait_for_function(
+    """
+    () => {
+        const slides = document.querySelectorAll(
+            '.slick-slide:not(.slick-cloned)[data-index]'
+        );
+        if (slides.length === 0) return false;
+
+        if (!window.__lastCount) {
+            window.__lastCount = slides.length;
+            window.__lastChange = Date.now();
+            return false;
+        }
+
+        if (slides.length !== window.__lastCount) {
+            window.__lastCount = slides.length;
+            window.__lastChange = Date.now();
+            return false;
+        }
+
+        return Date.now() - window.__lastChange > 800;
+    }
+    """,
+    timeout=20000
+)
+        #获取图片数量
+        max_index = page.evaluate("""
+() => {
+    const slides = document.querySelectorAll('[data-index]');
+    const indices = [...slides].map(el => Number(el.dataset.index));
+    return Math.max(...indices);
+}
+""")
+        img_num = (max_index + 1)//2
         #获取图片 URL
         img_url = []
-        for i in range(13):
+        for i in range(img_num):
             img_url.append(GetImageURL(page,i))
 
 
@@ -35,15 +70,15 @@ def download_image(URL):
             ),
             "Referer": URL,
         }
-        
+
         #检测URL id
-        URL_id = URL.split("&id=")[1].split("&cat")[0]
+        URL_id = URL.split("id=")[1].split("&cat")[0]
         #创建目录
         path = Path(f"data/images/{URL_id}")
         path.mkdir(parents=True, exist_ok=True)
 
         #下载图片
-        for n in range(13):
+        for n in range(img_num):
             #定义图片
             img = page.query_selector(f'.slick-slide[data-index="{n}"] img')
             #定位图片的上层分类元素
@@ -70,5 +105,5 @@ def download_image(URL):
         browser.close()
 
 if __name__ == "__main__":
-    test_product_URL = "https://www.goofish.com/item?spm=a21ybx.item.itemCnxh.11.69aa3da6p4pIWN&id=1007091382903&categoryId=0"
+    test_product_URL = "https://www.goofish.com/item?spm=a21ybx.search.searchFeedList.4.147641dbNLBFB2&id=1000595447381&categoryId=126860474"
     download_image(test_product_URL)
