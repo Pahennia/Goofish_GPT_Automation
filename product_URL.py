@@ -1,4 +1,3 @@
-from playwright.sync_api import sync_playwright
 from playwright.sync_api import sync_playwright, TimeoutError
 import requests
 
@@ -8,13 +7,24 @@ Test_Home_URL = "https://www.goofish.com/search?q=%E5%B7%B4%E9%BB%8E%E4%B8%96%E5
 def login_intercept_check(page):
     try:
         page.wait_for_selector(
-            'iframe[id*="xy-login-iframe"]',
-            timeout=1000
+            'iframe[src*="passport.goofish.com"]',
+            timeout=3000
         )
         print("检测到登录拦截，刷新页面")
         page.reload(wait_until="domcontentloaded")
     except TimeoutError:
         print("未检测到登录拦截")
+
+def waited_too_long(page):
+    try:
+        page.wait_for_selector(
+            'div[class*="feed-list"]',
+            timeout=3000
+        )
+    except TimeoutError:
+        print("等待时间太长，重新加载页面")
+        page.reload(wait_until="domcontentloaded")
+    
 
 def flip_page(page, page_num):
     if page_num <= 49:
