@@ -47,6 +47,9 @@ def get_product_URL(Home_URL):
         browser = p.chromium.launch(headless=False)
         page = browser.new_page()
         page.goto(Home_URL, wait_until="domcontentloaded")
+        #检测登录拦截
+        login_intercept_check(page)
+        #等待页面加载
         wait_for_page_load(page)
 
         #浏览器合法化请求头
@@ -58,8 +61,7 @@ def get_product_URL(Home_URL):
             ),
             "Referer": Home_URL
         })
-        #检测登录拦截
-        login_intercept_check(page)
+        
         #定位URL容器
         container = page.query_selector('div[data-spm="searchFeedList"]')
         links = container.query_selector_all(
@@ -67,7 +69,7 @@ def get_product_URL(Home_URL):
         
         )
         #为每一页循环获取URL
-        for i in range(1, 39):
+        for i in range(1, 30):
             #加载和初始化
             login_intercept_check(page)
             wait_for_page_load(page)
