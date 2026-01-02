@@ -73,6 +73,7 @@ def download(page, URL):
 }
 """)
         img_num = (max_index + 1)//2
+       
         #获取图片 URL
         img_url = []
         for i in range(img_num):
@@ -95,7 +96,10 @@ def download(page, URL):
         #创建目录
         path = Path(f"data/images/{URL_id}")
         path.mkdir(parents=True, exist_ok=True)
-
+        txt_path = path / "img_num.txt"
+        with open(txt_path, "w", encoding="utf-8") as f:
+            f.write(str(img_num) + "\n")
+        print("图片数量已保存：",img_num)
         #下载图片
         for n in range(img_num):
             #定义图片
