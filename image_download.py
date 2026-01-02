@@ -10,15 +10,33 @@ def GetImageURL(page, index):
     img = page.query_selector(f'.slick-slide[data-index="{index}"] img')
     return img.get_attribute("src")
 
-def download_image(URL):
+def download_image(urls):
+    print(len(urls))
+    a = 0
     with sync_playwright() as p:
-        #启动浏览器，初始化引擎
         browser = p.chromium.launch(headless=False)
-        page = browser.new_page()
+        pages = []
+        for i in range(2):
+            context = browser.new_context()
+            page = context.new_page()
+            pages.append(page)
+        pages[0].goto(urls[0])
+        for i in range(len(urls)-1):
+            pages[(i+1)%2].goto(urls[i+1])
+            download(pages[i%2], urls[i])
+        download(pages[(len(urls)-1)%2], urls[-1])
+        # finished = []
+        # for i in range(len(urls)//10):
+        #     for n in range(9):
+        #         #传送URL
+        #         print(urls[((i)*10)+(n)])
+        #         # pages[n-1].goto(urls[((i-1)*10)+(n-1)])
+        #         # finished[(i-1)*10+(n-1)] = download(pages[n-1],urls[((i-1)*10)+(n-1)])
 
-        #打开页面
-        page.goto(URL)
+        # for i in range(len(urls)):
+        #     print(urls[i])
 
+def download(page, URL):
         #等待加载
         page.wait_for_function(
     """
@@ -45,6 +63,7 @@ def download_image(URL):
     """,
     timeout=20000
 )
+        
         #获取图片数量
         max_index = page.evaluate("""
 () => {
@@ -102,7 +121,7 @@ def download_image(URL):
 
         
 
-        browser.close()
+        return True
 
 if __name__ == "__main__":
     test_product_URL = "https://www.goofish.com/item?spm=a21ybx.search.searchFeedList.4.147641dbNLBFB2&id=1000595447381&categoryId=126860474"

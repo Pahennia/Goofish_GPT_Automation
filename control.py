@@ -8,10 +8,8 @@ def grab_all_urls():
     #加载全部URL
     all_urls = product_URL.get_product_URL(test_page_URL)
     #下载全部URL图片
-    for url in all_urls:
-        image_download.download_image(url)
-        time.sleep(4)
     print(all_urls)
+    image_download.download_image(all_urls)
     #保存所有URL到本地文件
     with open("urls.txt", "w", encoding="utf-8") as f:
         for url in all_urls:

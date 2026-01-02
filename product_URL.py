@@ -1,9 +1,10 @@
 from playwright.sync_api import sync_playwright, TimeoutError
 import requests
-
+import time
 
 Test_Home_URL = "https://www.goofish.com/search?q=%E5%B7%B4%E9%BB%8E%E4%B8%96%E5%AE%B6track1.0&spm=a21ybx.search.searchInput.0"
 
+#主动监听是否有登录界面
 def login_intercept_check(page):
     try:
         page.wait_for_selector(
@@ -12,9 +13,10 @@ def login_intercept_check(page):
         )
         print("检测到登录拦截，刷新页面")
         page.reload(wait_until="domcontentloaded")
+        login_intercept_check(page)
     except TimeoutError:
         print("未检测到登录拦截")
-
+#长时间不加载商品列表就刷新页面
 def waited_too_long(page):
     try:
         page.wait_for_selector(
@@ -25,12 +27,13 @@ def waited_too_long(page):
         print("等待时间太长，重新加载页面")
         page.reload(wait_until="domcontentloaded")
     
-
+#翻页函数
 def flip_page(page, page_num):
     if page_num <= 49:
         page.click('button:has(div[class*="arrow-right"])')
         print(f"已翻至第 {page_num+1} 页")
 
+#等待商品完全加载
 def wait_for_page_load(page):
     page.wait_for_function(
             """
@@ -72,24 +75,26 @@ def get_product_URL(Home_URL):
             "Referer": Home_URL
         })
         
-        #定位URL容器
-        container = page.query_selector('div[data-spm="searchFeedList"]')
-        links = container.query_selector_all(
-            'a[href^="https://www.goofish.com/item"]'
         
-        )
         #为每一页循环获取URL
-        for i in range(1, 30):
+        for i in range(2):
             #加载和初始化
             login_intercept_check(page)
             wait_for_page_load(page)
+            #定位URL容器
+            container = page.query_selector('div[data-spm="searchFeedList"]')
+            links = container.query_selector_all(
+                'a[href^="https://www.goofish.com/item"]'
+            )
             #获取链接
             for a in links:
                 href = a.get_attribute("href")
                 all_urls.append(href)
-            print(f"第 {i} 页 URL 获取完成")
+            print(f"第 {i+1} 页 URL 获取完成")
             #页面翻页，初始化
             flip_page(page, i)
+            #防止风控
+            time.sleep(3)
             
 
         
