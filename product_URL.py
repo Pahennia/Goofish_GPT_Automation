@@ -77,7 +77,8 @@ def get_product_URL(Home_URL):
         
         
         #为每一页循环获取URL
-        for i in range(2):
+        
+        for i in range(1):
             #加载和初始化
             login_intercept_check(page)
             wait_for_page_load(page)
@@ -91,10 +92,13 @@ def get_product_URL(Home_URL):
                 href = a.get_attribute("href")
                 all_urls.append(href)
             print(f"第 {i+1} 页 URL 获取完成")
+            
+            # if i == max(range(0)-1):
+            #     break
             #页面翻页，初始化
             flip_page(page, i)
             #防止风控
-            time.sleep(3)
+            time.sleep(2)
             
 
         

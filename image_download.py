@@ -25,16 +25,6 @@ def download_image(urls):
             pages[(i+1)%2].goto(urls[i+1])
             download(pages[i%2], urls[i])
         download(pages[(len(urls)-1)%2], urls[-1])
-        # finished = []
-        # for i in range(len(urls)//10):
-        #     for n in range(9):
-        #         #传送URL
-        #         print(urls[((i)*10)+(n)])
-        #         # pages[n-1].goto(urls[((i-1)*10)+(n-1)])
-        #         # finished[(i-1)*10+(n-1)] = download(pages[n-1],urls[((i-1)*10)+(n-1)])
-
-        # for i in range(len(urls)):
-        #     print(urls[i])
 
 def download(page, URL):
         #等待加载
@@ -118,7 +108,7 @@ def download(page, URL):
             #下载图片
             resp = requests.get(img_url[n], headers=headers, timeout=10)
             resp.raise_for_status()             
-            img_path = path / f"img_{n}.jpg"
+            img_path = path / f"img_{n+1}.jpg"
             img_path.write_bytes(resp.content)
             print(f"已保存：{img_path}")
 
